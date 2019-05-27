@@ -47,7 +47,7 @@ public class ExtFlightDelaysController {
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
-
+    	this.model.creaGrafo();
     }
 
     @FXML
@@ -57,11 +57,17 @@ public class ExtFlightDelaysController {
 
     @FXML
     void doVisualizzaVelivoli(ActionEvent event) {
-
+    	String stato = this.cmbBoxStati.getValue();
+    	if(stato != null){
+    		this.txtResult.setText(this.model.visualizzaVoli(stato));
+    	} else {
+    		this.txtResult.setText("Devi selezionare uno stato!");
+    	}
     }
     
     public void setModel(Model model) {
 		this.model = model;	
+		this.cmbBoxStati.getItems().addAll(this.model.getStati());
 	}
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
