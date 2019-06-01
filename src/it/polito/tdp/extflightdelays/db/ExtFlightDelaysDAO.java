@@ -10,6 +10,7 @@ import java.util.List;
 
 import it.polito.tdp.extflightdelays.model.Airline;
 import it.polito.tdp.extflightdelays.model.Airport;
+import it.polito.tdp.extflightdelays.model.Collegamento;
 import it.polito.tdp.extflightdelays.model.Flight;
 
 public class ExtFlightDelaysDAO {
@@ -104,6 +105,73 @@ public class ExtFlightDelaysDAO {
 						rs.getDouble("ELAPSED_TIME"), rs.getInt("DISTANCE"),
 						rs.getTimestamp("ARRIVAL_DATE").toLocalDateTime(), rs.getDouble("ARRIVAL_DELAY"));
 				result.add(flight);
+			}
+
+			conn.close();
+			return result;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Errore connessione al database");
+			throw new RuntimeException("Error Connection Database");
+		}
+	}
+	
+	public List<Collegamento> loadAllArchi() {
+		String sql = "SELECT a1.STATE AS statop,a2.STATE AS statoa  " + 
+				"FROM airports AS a1 , airports AS a2 , flights AS f   " + 
+				"WHERE a1.STATE<> a2.STATE AND (a1.ID=f.ORIGIN_AIRPORT_ID OR a1.ID=f.DESTINATION_AIRPORT_ID)  " + 
+				"AND (a2.ID=f.ORIGIN_AIRPORT_ID OR a2.ID=f.DESTINATION_AIRPORT_ID)  " + 
+				"GROUP BY a1.STATE,a2.STATE";
+		List<Collegamento> result = new LinkedList<Collegamento>();
+
+		try {
+			Connection conn = ConnectDB.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			ResultSet rs = st.executeQuery();
+
+			while (rs.next()) {
+				Collegamento coll = new Collegamento(rs.getString("statop"),rs.getString("statoa"));
+				
+				result.add(coll);
+				
+			}
+
+			conn.close();
+			return result;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Errore connessione al database");
+			throw new RuntimeException("Error Connection Database");
+		}
+	}
+	
+	public int  getPesoArco(String statop,String statoa) {
+		
+		String sql = "SELECT COUNT(DISTINCT TAIL_NUMBER) AS n  " + 
+				"FROM airports AS  a1 , airports AS a2 , flights AS f  " + 
+				"WHERE a1.STATE<> a2.STATE AND   " + 
+				"a1.STATE= ?  AND  a2.STATE= ?  AND a1.ID=f.ORIGIN_AIRPORT_ID AND a2.ID=f.DESTINATION_AIRPORT_ID "; 
+				
+		
+		
+
+		try {
+			Connection conn = ConnectDB.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			
+			
+				st.setString(1,statop);
+				st.setString(2,statoa);
+				ResultSet rs = st.executeQuery();
+				
+				int result = 0;
+
+			while (rs.next()) {
+				result = rs.getInt("n");
+			
+				
 			}
 
 			conn.close();

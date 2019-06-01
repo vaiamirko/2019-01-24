@@ -8,6 +8,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import it.polito.tdp.extflightdelays.model.Model;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -17,6 +18,8 @@ import javafx.scene.control.TextField;
 
 public class ExtFlightDelaysController {
 	private Model model;
+	
+	
 
     @FXML // ResourceBundle that was given to the FXMLLoader
     private ResourceBundle resources;
@@ -47,6 +50,11 @@ public class ExtFlightDelaysController {
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
+    	model.creaGrafo();
+    	txtResult.appendText("grafo creato!!!");
+    	
+    	btnVisualizzaVelivoli.setDisable(false);
+    	
 
     }
 
@@ -57,11 +65,22 @@ public class ExtFlightDelaysController {
 
     @FXML
     void doVisualizzaVelivoli(ActionEvent event) {
-
+    	txtResult.clear();
+    	
+    	String stato = cmbBoxStati.getValue();
+    	if(stato == null) {
+    		txtResult.appendText("devi selezionare uno stato per visualizzare un i veivoli ");
+    	}else {
+    	
+    	txtResult.appendText(model.visualizzaVelivoli(stato).toString());
+    	}
     }
     
     public void setModel(Model model) {
 		this.model = model;	
+		
+	this.cmbBoxStati.getItems().addAll(this.model.getStati());
+	
 	}
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
@@ -73,6 +92,8 @@ public class ExtFlightDelaysController {
         assert txtT != null : "fx:id=\"txtT\" was not injected: check your FXML file 'ExtFlightDelays.fxml'.";
         assert txtG != null : "fx:id=\"txtG\" was not injected: check your FXML file 'ExtFlightDelays.fxml'.";
         assert btnSimula != null : "fx:id=\"btnSimula\" was not injected: check your FXML file 'ExtFlightDelays.fxml'.";
+        btnSimula.setDisable(true);
+        btnVisualizzaVelivoli.setDisable(true);
 
     }
 }
